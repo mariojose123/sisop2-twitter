@@ -1,4 +1,4 @@
-#include "../include/Profile.hpp"
+#include "include/Profile.hpp"
 #include <string>
 #include <vector>
 void Profile::profilestring(string s){

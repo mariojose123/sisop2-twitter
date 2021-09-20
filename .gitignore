@@ -2,3 +2,11 @@
 .idea/
 
 
+
+src/cmake-build-debug/
+
+src/CMakeLists.txt
+
+cmake-build-debug/
+
+CMakeLists.txt
