@@ -27,8 +27,8 @@ class Server{
         void follow(){
 
         }
-        void message(){
-
+        void message(packet readpacket){
+            cout << "Tweet novo: " << readpacket._payload;
         }
         void saveDataBase(){
 
@@ -45,14 +45,16 @@ class Server{
                 mtx.unlock();
                 if(isFull){
                     n = write(newsockfd,"Login failed\n", 18);
-                    if (n < 0) 
+                    if (n < 0) {
+                        cout << n << endl;
                         cout <<"ERROR writing to socket\n"<< std::flush;
+                    }
                 }
                 else{
                     mtx.lock();
                     NumberofUsers[readpacket._payload]++;
                     mtx.unlock();
-                    n = write(newsockfd,"login successful", 18);
+                    n = write(newsockfd,"Login successful\n", 18);
                     if (n < 0) 
                         cout <<"Login successful\n"<< std::flush;
                 }
@@ -99,10 +101,10 @@ class Server{
             cout<<"Server online\n"<<std::flush;
             clilen = sizeof(struct sockaddr_in);
             while(true){
-            if ((newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen)) == -1) 
-                cout <<"ERROR on accept\n"<< std::flush;
-            else
-                threadsTCP.insert(threadsTCP.begin(),thread(&Server::TCPloop,this));
+                if ((newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen)) == -1) 
+                    cout <<"ERROR on accept\n"<< std::flush;
+                else
+                    threadsTCP.insert(threadsTCP.begin(),thread(&Server::TCPloop,this));
             }
             close(newsockfd);
             close(sockfd);  
@@ -113,24 +115,36 @@ class Server{
         void TCPloop(){
             char buffer[2048];
             /* read from the socket */
-            int n = read(newsockfd, buffer, 2048);
+            int n = 0;
             //cout<<buffer<<std::flush;
             packet readpacket = packet(buffer);
-            // cout<<"Message Recivied\n"<<std::flush;
-            // cout<<readpacket.type<<std::flush;
-            // cout<<readpacket.seqn<<std::flush;
-            switch(readpacket.type){
-                case 1: login(readpacket);
-                break;
-                //case 3: follow(packet);
-                //break;
-                //case 4: message(packet);
-                //break;
+            //cout<<"Message Received\n"<<std::flush;
+            //cout<<readpacket.type<<std::flush;
+            //cout<<readpacket.timestamp<<std::flush;
+            //cout<<readpacket._payload<<endl<<std::flush;
+            while(true){
+                //n = recv(sockfd, &buffer, sizeof(buffer), 0);
+                readpacket=packet(buffer);
+                cout<<"Message Received\n"<<std::flush;
+                cout<<readpacket.type<<std::flush;
+                cout<<readpacket.seqn<<std::flush;
+                cout<<readpacket.timestamp<<std::flush;
+                cout<<readpacket._payload<<endl<<std::flush;
+                switch(readpacket.type){
+                    case 1: login(readpacket);
+                    break;
+                    //case 3: follow(packet);
+                    //break;
+                    case 4: 
+                        cout << "Chegou um tweet" << endl << flush;
+                        message(readpacket);
+                    break;
+                }
             }
             // Notification()
             // saveServer();
             if (n < 0) 
-                cout <<"ERROR reading from socket\n"<< std::flush;
+                cout <<"Server: ERROR reading from socket\n"<< std::flush;
 
         }
 };

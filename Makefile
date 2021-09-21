@@ -7,6 +7,7 @@ build_client:
 create:
 	./client $(user) 127.0.0.1 4924
 
-
+debug_server:
+	gdb
 
 

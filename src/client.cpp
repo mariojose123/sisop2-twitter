@@ -18,7 +18,8 @@ vector<string> getInput(){
 	getline(cin, input);
 	input.erase(std::remove(input.begin(), input.end(), '\n'), input.end());
 	vector<string> arguments;
-	boost::split(arguments, input, [](char c){return c == ' ';});
+	//boost::split(arguments, input, [](char c){return c == ' ';});
+    boost::split( arguments, input , boost::is_any_of(" "), boost::token_compress_on);
 	return arguments;
 }
 
@@ -46,7 +47,7 @@ int get_connection(string PORTSTRING, const char* ipstring) {
 
 
 string get_login_message(string profile) {
-    string message = "1 0 "+ to_string(profile.size())+ " 0 "+profile+"\n";
+    string message = "1 0 "+ to_string(profile.size())+ " 0 "+profile+" ";
     return message;
 }
 
@@ -71,8 +72,32 @@ void send_message(int sockfd, string message) {
 
     cout<<buffer<<std::flush;
     
-	close(sockfd); // NO FINAL DA MENSAGEM ELA FECHA A CONEXAO
+	//close(sockfd); // NO FINAL DA MENSAGEM ELA FECHA A CONEXAO
 }
+
+string get_tweet_message(string tweet){
+    string message = "4 0 "+ to_string(tweet.size())+ " 0 "+tweet+" ";
+    return message;
+}
+
+void send_tweet(int sockfd, string message) {
+	/* write in the socket */
+    char buffer[2048];
+    strcpy(buffer, message.c_str());
+	send(sockfd , buffer , strlen(buffer) , 0 );
+    char bufferread[256];
+    bzero(buffer,256);
+	
+	/* read from the socket */
+    int n = read(sockfd, buffer, 256);
+    if (n < 0) 
+		cout<<"ERROR reading from socket\n"<<std::flush;
+
+    cout<<buffer<<std::flush;
+    
+	//close(sockfd); // NO FINAL DA MENSAGEM ELA FECHA A CONEXAO
+}
+
 int main(int argc,char *argv[])
 {
     bool hasSessionEnded = false;
@@ -88,21 +113,27 @@ int main(int argc,char *argv[])
         cout<<"Server offline" << endl;
         return 2;
     }
-    else {
-        string initial_message = get_login_message(profile);
-        send_message(sockfd, initial_message);
-        cout<<"Enter the message: "<<std::flush;
-        while (true) {
-            vector<string> input = getInput();
-            string command = input[0];
-            string message = input[1];
-            if (command == "FOLLOW") {
+    
+    string initial_message = get_login_message(profile);
+    send_message(sockfd, initial_message);
+    while (true) {
+        cout<<"Enter command: "<<std::flush;
+        vector<string> input = getInput();
+        string command = input[0];
+        string message = input[1];
+        if (command == "FOLLOW") {
 
-            } else if (command == "Message") {
-                
-            }
+        } else if (command == "SEND") {
+            string tweet;
+            tweet=get_tweet_message(message);
+            send_tweet(sockfd, tweet);
+        } else{
+            cout<<"Usage: SEND <message> / FOLLOW <user>"<< endl<<flush;
         }
+        
     }
+    
 
+    close(sockfd);
     return 0;
 }

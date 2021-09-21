@@ -12,5 +12,5 @@ cmake-build-debug/
 
 CMakeLists.txt
 
-settings.json
+*.json
 
