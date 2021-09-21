@@ -40,7 +40,8 @@ class Server{
         void saveDataBase(){
 
         }
-        int login(packet  readpacket ){
+        int login(packet  readpacket )
+        {
             int n;
             mtx.lock();
             bool IsntNewUser=NumberofUsers.find(readpacket._payload) != NumberofUsers.end();
@@ -50,9 +51,9 @@ class Server{
                 bool isFull = NumberofUsers[readpacket._payload]==2;
                 mtx.unlock();
                 if(isFull){
-                    n = write(newsockfd,"login failed", 18);
+                    n = write(newsockfd,"Login failed\n", 18);
                     if (n < 0) 
-                        cout <<"ERROR writing to socket"<< std::flush;
+                        cout <<"ERROR writing to socket\n"<< std::flush;
                 }
                 else{
                     mtx.lock();
@@ -60,7 +61,7 @@ class Server{
                     mtx.unlock();
                     n = write(newsockfd,"login successful", 18);
                     if (n < 0) 
-                        cout <<"login successful"<< std::flush;
+                        cout <<"Login successful\n"<< std::flush;
                 }
             }
             else {
@@ -69,9 +70,9 @@ class Server{
                 database.AddProfile(readpacket._payload);
                 NumberofUsers.insert(it, pair<string,int>(readpacket._payload,1));
                 mtx.unlock();
-                n = write(newsockfd,"login successful", 18);
+                n = write(newsockfd,"Login successful\n", 18);
                     if (n < 0) 
-                        cout <<"login successful"<< std::flush;
+                        cout <<"Login successful\n"<< std::flush;
             }
             return true;
         }
@@ -91,20 +92,20 @@ class Server{
 	    char buffer[256];
 	    struct sockaddr_in serv_addr, cli_addr;
 	    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
-            cout <<"ERROR opening socket"<< std::flush;
+            cout <<"ERROR opening socket\n"<< std::flush;
         
 	    serv_addr.sin_family = AF_INET;
 	    serv_addr.sin_port = htons(PORT);
 	    serv_addr.sin_addr.s_addr = INADDR_ANY;
 	    bzero(&(serv_addr.sin_zero), 8);
 	    if (::bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-		    printf("ERROR on binding");
+		    printf("ERROR on binding\n");
 	    listen(sockfd, 5);
         cout<<"Server online\n"<<std::flush;
 	    clilen = sizeof(struct sockaddr_in);
         while(true){
 	    if ((newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen)) == -1) 
-		    cout <<"ERROR on accept"<< std::flush;
+		    cout <<"ERROR on accept\n"<< std::flush;
         else{
             threadsTCP.insert(threadsTCP.begin(),thread(&Server::TCPloop,this));
         }
@@ -137,7 +138,7 @@ class Server{
             // Notification()
             // saveServer();
             if (n < 0) 
-                cout <<"ERROR reading from socket"<< std::flush;
+                cout <<"ERROR reading from socket\n"<< std::flush;
 
         }
 };

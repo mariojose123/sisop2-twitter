@@ -52,7 +52,7 @@ int get_connection(string PORTSTRING, const char* ipstring) {
 
 
 string get_login_message(string profile) {
-    string message = "1 0 "+ to_string(profile.size())+ " 0 "+profile+" ";
+    string message = "1 0 "+ to_string(profile.size())+ " 0 "+profile+"\n";
     return message;
 }
 
