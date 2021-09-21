@@ -11,3 +11,6 @@ src/CMakeLists.txt
 cmake-build-debug/
 
 CMakeLists.txt
+
+settings.json
+

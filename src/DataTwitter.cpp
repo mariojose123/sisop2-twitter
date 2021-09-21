@@ -1,5 +1,6 @@
 #include "include/DataTwitter.hpp"
 #include <string>
+
 using namespace std;
 Profile DataTwitter::FindProfile(string name)
 {

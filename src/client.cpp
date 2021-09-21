@@ -2,15 +2,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <vector>
-#include <unistd.h>
-#include <string.h>
 #include <iostream>
 #include <boost/algorithm/string.hpp>
-
 
 using namespace std;
 
@@ -41,7 +35,7 @@ int get_connection(string PORTSTRING, const char* ipstring) {
     bzero(&(serv_addr.sin_zero), 8);
 
     if (inet_pton(AF_INET, ipstring, &serv_addr.sin_addr) <= 0) {
-        cout << "\nInvalid address/ Address not supported \n" << std::flush;
+        cout << "Invalid address/Address not supported\n" << std::flush;
         return 1;
     }
     if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
@@ -57,7 +51,7 @@ string get_login_message(string profile) {
 }
 
 string get_follow_message(string profile, string followed) {
-    string message =  profile + " FOLLOW "+ "followed";
+    string message =  profile + " FOLLOW "+ followed;
     return message;
 }
 
@@ -82,8 +76,9 @@ void send_message(int sockfd, string message) {
 int main(int argc,char *argv[])
 {
     bool hasSessionEnded = false;
-    if(argc==3){
-        cout<<"incorrect input\n"<<endl;
+    if(argc!=4){
+        cout<<"Usage: ./client <user> 127.0.0.1 4924"<<endl;
+        return 1;
     }
     string profile(argv[1]);
     const char* IP(argv[2]);
@@ -91,7 +86,7 @@ int main(int argc,char *argv[])
     int sockfd = get_connection(localIP,IP);
     if (sockfd == -1) {
         cout<<"Server offline" << endl;
-        return 1;
+        return 2;
     }
     else {
         string initial_message = get_login_message(profile);
@@ -104,9 +99,10 @@ int main(int argc,char *argv[])
             if (command == "FOLLOW") {
 
             } else if (command == "Message") {
-
+                
             }
-
         }
     }
+
+    return 0;
 }
