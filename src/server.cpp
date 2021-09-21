@@ -113,19 +113,18 @@ class Server {
 
         void TCPloop() {
             char buffer[2048];
-            int n;
             packet readpacket = packet(buffer);
-            // while(true) {
-                n = recv(newsockfd, &buffer, sizeof(buffer), 0);
-                if (n == -1)
-                    cout <<"Server: ERROR reading from socket\n"<< std::flush;
+
+            while(true) {
+                if (recv(newsockfd, &buffer, sizeof(buffer), 0) == -1)
+                    cout <<"Server: ERROR reading from socket\n"<< flush;
 
                 readpacket = packet(buffer);
-                cout << "Message Received\n" << std::flush;
-                cout << readpacket.type << std::flush;
-                cout << readpacket.seqn << std::flush;
-                cout << readpacket.timestamp << std::flush;
-                cout << readpacket._payload << endl << std::flush;
+                cout << "\n\nPacote recebido:\n" << flush;
+                cout << "\nTipo: " + readpacket.type << flush;
+                cout << "\nSequência: " + readpacket.seqn << flush;
+                cout << "\nTimestamp: " + readpacket.timestamp << flush;
+                cout << "\nPayload: " + readpacket._payload << endl << flush;
 
                 switch(readpacket.type) {
                     case LOGINPKT:
@@ -140,14 +139,11 @@ class Server {
                         message(readpacket);
                         break;
                     default:
-                        cout << "Tipo de pacote errado!" << endl << flush;
+                        cout << "Tipo de pacote desconhecido!" << endl << flush;
                 }
-            // }
+            }
             // Notification()
             // saveServer();
-            if (n < 0) 
-                cout <<"Server: ERROR reading from socket\n"<< std::flush;
-
         }
 };
 
