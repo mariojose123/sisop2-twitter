@@ -10,6 +10,7 @@
 #include <thread>
 #include <cstring>
 #include "include/DataTwitter.hpp"
+#include <cstdio>
 
 #define PORT 4924
 
@@ -26,8 +27,9 @@ class Server {
 
         }
 
-        void message(packet readpacket) {
-            cout << "Tweet novo: " << readpacket._payload;
+        //não funciona:
+        void message(std::string message) {
+            cout << "Chegou no message: " + message;
         }
 
         void saveDataBase() {
@@ -120,11 +122,15 @@ class Server {
                     cout <<"Server: ERROR reading from socket\n"<< flush;
 
                 readpacket = packet(buffer);
-                cout << "\n\nPacote recebido:\n" << flush;
-                cout << "\nTipo: " + readpacket.type << flush;
-                cout << "\nSequência: " + readpacket.seqn << flush;
-                cout << "\nTimestamp: " + readpacket.timestamp << flush;
-                cout << "\nPayload: " + readpacket._payload << endl << flush;
+
+                printf("\n\nPacote recebido:\nTipo: %d\nSequência: %d\nTimestamp: %d\n", 
+                readpacket.type, readpacket.seqn, readpacket.timestamp);
+                // cout << "\n\nPacote recebido:\n";
+
+                // cout << "\nTipo: " + readpacket.type;
+                // cout << "\nSequência: " + readpacket.seqn;
+                // cout << "\nTimestamp: " + readpacket.timestamp;
+                cout << "\nPayload: " + readpacket.getPayload() << endl;
 
                 switch(readpacket.type) {
                     case LOGINPKT:
@@ -135,8 +141,9 @@ class Server {
                     case NOTIFICATIONPKT:
                         break;
                     case MESSAGEPKT:
-                        cout << "Chegou um tweet" << endl << flush;
-                        message(readpacket);
+                        //message(packet.getPayload())
+                        cout << "Chegou um tweet: " << endl << flush;
+                        cout << readpacket.getPayload() << endl;
                         break;
                     default:
                         cout << "Tipo de pacote desconhecido!" << endl << flush;

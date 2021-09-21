@@ -86,16 +86,6 @@ void send_tweet(int sockfd, string message) {
     char buffer[2048];
     strcpy(buffer, message.c_str());
 	send(sockfd, buffer, strlen(buffer), 0);
-    char bufferread[256];
-    bzero(buffer, 256);
-	
-	/* read from the socket */
-    int n = read(sockfd, buffer, 256);
-    if (n == -1) 
-		cout << "ERROR reading from socket\n" << std::flush;
-
-    cout << buffer << std::flush;
-	//close(sockfd); // NO FINAL DA MENSAGEM ELA FECHA A CONEXAO
 }
 
 int main(int argc,char *argv[]) {

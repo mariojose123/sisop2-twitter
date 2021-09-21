@@ -16,4 +16,9 @@ class packet {
     int length;       //Comprimento do payload  
     int timestamp;     // Timestamp do dado 
     std::string _payload;    //Dados da mensagem 
+
+    std::string getPayload(){
+      return _payload;
+    }
+
 };

@@ -22,7 +22,7 @@ packet::packet(char str[2048]) {
     string charArrayMarshal;
     stringstream ss;
 
-    cout << strUnmarshal << std::flush;
+    //cout << strUnmarshal << std::flush;
     ss << strUnmarshal;
     ss >> this->type >> this->seqn >> this->length >> this->timestamp >> charArrayMarshal;
     this->_payload = charArrayMarshal;
