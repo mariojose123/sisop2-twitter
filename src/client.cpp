@@ -55,7 +55,12 @@ string get_login_message(string profile) {
 }
 
 string get_follow_message(string profile, string followed) {
-    string message =  profile + " FOLLOW " + followed;
+    string message = "3 0 " + to_string(profile.size()) + " 0 " + followed + " ";
+    return message;
+}
+
+string get_tweet_message(string tweet) {
+    string message = "4 0 " + to_string(tweet.size()) + " 0 " + tweet + " ";
     return message;
 }
 
@@ -76,11 +81,6 @@ void send_message(int sockfd, string message) {
 	//close(sockfd); // NO FINAL DA MENSAGEM ELA FECHA A CONEXAO
 }
 
-string get_tweet_message(string tweet) {
-    string message = "4 0 " + to_string(tweet.size()) + " 0 " + tweet + " ";
-    return message;
-}
-
 void send_tweet(int sockfd, string message) {
 	/* write in the socket */
     char buffer[2048];
@@ -88,8 +88,13 @@ void send_tweet(int sockfd, string message) {
 	send(sockfd, buffer, strlen(buffer), 0);
 }
 
+bool isLogout(){
+    return false;
+}
+
+
 int main(int argc,char *argv[]) {
-    if(argc !=4 ) {
+    if(argc !=4) {
         cout << "Usage: ./client <user> 127.0.0.1 4924" << endl;
         return 1;
     }
@@ -107,10 +112,10 @@ int main(int argc,char *argv[]) {
     string initial_message = get_login_message(profile);
     send_message(sockfd, initial_message);
     
-    while (true) {
+    while (true && !isLogout()) {
         cout << "Enter command: " << std::flush;
         vector<string> input = getInput();
-        string command = input[0];
+        string command = boost::to_upper_copy(input[0]);
         string message = input[1];
         if (command == "FOLLOW") {
             continue;

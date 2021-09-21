@@ -2,7 +2,10 @@
  - escrita e login: mario
  - notificacao: Rafael
  - follow: will
- - messages: gabriel e rafael 
+ - comunicação: gabriel e rafael 
+ - logout: rafael
+ - refatorar: 
+ - escrever num arquivo: 
 
 ### modelo da classe principal
 ```

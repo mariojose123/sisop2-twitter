@@ -1,6 +1,7 @@
 #include "include/Profile.hpp"
 #include <string>
 #include <vector>
+
 void Profile::profilestring(string s){
   this->profile = s;
   vector<string> followersvector;

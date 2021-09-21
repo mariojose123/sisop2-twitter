@@ -21,6 +21,8 @@ class Server {
         mutex mtx;
         DataTwitter database;
         vector<thread> threadsTCP;
+
+        //server_socket, client_socket
         int sockfd, newsockfd;
 
         void follow() {
@@ -88,6 +90,7 @@ class Server {
             socklen_t clilen;
             char buffer[256];
             struct sockaddr_in serv_addr, cli_addr;
+
             if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
                 cout << "ERROR opening socket\n" << std::flush;
             
@@ -100,6 +103,8 @@ class Server {
             listen(sockfd, 5);
             cout<<"Server online\n"<<std::flush;
             clilen = sizeof(struct sockaddr_in);
+
+            //loop que aceita conexoes novas
             while(true) {
                 if ((newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen)) == -1) 
                     cout <<"ERROR on accept\n"<< std::flush;
@@ -114,9 +119,10 @@ class Server {
         map<string, int> NumberofUsers;
 
         void TCPloop() {
+            string username;
             char buffer[2048];
             packet readpacket = packet(buffer);
-
+            
             while(true) {
                 if (recv(newsockfd, &buffer, sizeof(buffer), 0) == -1)
                     cout <<"Server: ERROR reading from socket\n"<< flush;
@@ -126,7 +132,6 @@ class Server {
                 printf("\n\nPacote recebido:\nTipo: %d\nSequência: %d\nTimestamp: %d\n", 
                 readpacket.type, readpacket.seqn, readpacket.timestamp);
                 // cout << "\n\nPacote recebido:\n";
-
                 // cout << "\nTipo: " + readpacket.type;
                 // cout << "\nSequência: " + readpacket.seqn;
                 // cout << "\nTimestamp: " + readpacket.timestamp;
@@ -134,6 +139,8 @@ class Server {
 
                 switch(readpacket.type) {
                     case LOGINPKT:
+                        username = readpacket.getPayload();
+                        cout << "Username: " << username << endl;
                         login(readpacket);
                         break;
                     case FOLLOWPKT:
@@ -142,6 +149,7 @@ class Server {
                         break;
                     case MESSAGEPKT:
                         //message(packet.getPayload())
+                        cout << "Mensagem de " << username << " ";
                         cout << "Chegou um tweet: " << endl << flush;
                         cout << readpacket.getPayload() << endl;
                         break;
