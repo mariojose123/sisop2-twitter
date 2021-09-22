@@ -110,10 +110,7 @@ class Server {
                     cout <<"ERROR on accept\n"<< std::flush;
                 else
                     threadsTCP.insert(threadsTCP.begin(), thread(&Server::TCPloop, this));
-            }      
-            
-            close(newsockfd);
-            close(sockfd);  
+            }
         }
 
     private:
@@ -130,18 +127,18 @@ class Server {
 
                 readpacket = packet(buffer);
 
-                printf("\n\nPacote recebido:\nTipo: %d\nSequência: %d\nTimestamp: %d\n", 
-                readpacket.type, readpacket.seqn, readpacket.timestamp);
+                //printf("\n\nPacote recebido:\nTipo: %d\nSequência: %d\nTimestamp: %d\n",
+                //readpacket.type, readpacket.seqn, readpacket.timestamp);
                 // cout << "\n\nPacote recebido:\n";
                 // cout << "\nTipo: " + readpacket.type;
                 // cout << "\nSequência: " + readpacket.seqn;
                 // cout << "\nTimestamp: " + readpacket.timestamp;
-                cout << "\nPayload: " + readpacket.getPayload() << endl;
+                //cout << "\nPayload: " + readpacket.getPayload() << endl;
 
                 switch(readpacket.type) {
                     case LOGINPKT:
                         username = readpacket.getPayload();
-                        cout << "Username: " << username << endl;
+                        cout << "Login username: " << username << endl;
                         login(readpacket);
                         break;
                     case FOLLOWPKT:
@@ -150,9 +147,7 @@ class Server {
                         break;
                     case MESSAGEPKT:
                         //message(packet.getPayload())
-                        cout << "Mensagem de " << username << " ";
-                        cout << "Chegou um tweet: " << endl << flush;
-                        cout << readpacket.getPayload() << endl;
+                        cout << "Mensagem de " << username << "\t" << "| Chegou um tweet: " << readpacket.getPayload() << endl;
                         break;
                     default:
                         cout << "Tipo de pacote desconhecido!" << endl << flush;
