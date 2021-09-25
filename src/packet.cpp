@@ -13,7 +13,7 @@ char* packet::toString() {
                           + " length= " + std::to_string(this->length) + " timestamp= " + std::to_string(this->timestamp)
                           + " string= " + myString;
 
-    int length = returnString.length();
+    length = returnString.length();
     char char_return[length + 1];
     strcpy(char_return, returnString.c_str());
     

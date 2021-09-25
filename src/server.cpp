@@ -92,37 +92,42 @@ class Server {
         }
 
         void runTCP() {
-            int opt = 1;
-            int n;
+            int bindSuccess = -1;
             socklen_t clilen;
             char buffer[256];
             struct sockaddr_in serv_addr, cli_addr;
 
-            if ((server_socket
- = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
+            //cria socket do servidor
+            server_socket = socket(AF_INET, SOCK_STREAM, 0);
+            if (server_socket == -1) 
                 cout << "ERROR opening socket\n" << std::flush;
             
+            //define endereço do servidor
             serv_addr.sin_family = AF_INET;
             serv_addr.sin_port = htons(PORT);
             serv_addr.sin_addr.s_addr = INADDR_ANY;
             bzero(&(serv_addr.sin_zero), 8);
-            if (::bind(server_socket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+
+            //bind o socket ao IP especificado
+            bindSuccess = ::bind(server_socket, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
+            if (bindSuccess < 0)
                 cout <<"ERROR on binding\n"<<std::flush;
+
             listen(server_socket, 5);
             cout<<"Server online\n"<<std::flush;
             clilen = sizeof(struct sockaddr_in);
 
             //loop que aceita conexoes novas
             while(true) {
-                if ((client_socket = accept(server_socket, (struct sockaddr *) &cli_addr, &clilen)) == -1) 
+                client_socket = accept(server_socket, (struct sockaddr *) &cli_addr, &clilen);
+                if (client_socket == -1) 
                     cout <<"ERROR on accept\n"<< std::flush;
                 else
                     threadsTCP.insert(threadsTCP.begin(), thread(&Server::TCPloop, this));
             }      
             
             close(client_socket);
-            close(server_socket
-);  
+            close(server_socket);  
         }
 
     private:
@@ -159,9 +164,8 @@ class Server {
                         break;
                     case MESSAGEPKT:
                         //message(packet.getPayload())
-                        cout << "Mensagem de " << username << " ";
-                        cout << "Chegou um tweet: " << endl << flush;
-                        cout << readpacket.getPayload() << endl;
+                        cout << "Mensagem de " << username << ":\n";
+                        cout << readpacket.getPayload() << endl << flush;
                         break;
                     default:
                         cout << "Tipo de pacote desconhecido!" << endl << flush;
