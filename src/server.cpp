@@ -21,9 +21,8 @@ class Server {
         mutex mtx;
         DataTwitter database;
         vector<thread> threadsTCP;
-
-        //server_socket, client_socket
-        int sockfd, newsockfd;
+        
+        int server_socket, client_socket;
 
         void follow() {
 
@@ -39,36 +38,44 @@ class Server {
         }
 
         int login(packet readpacket) {
-            int n;
+            int bytesWritten; // se bytesWritten<0 -> erro
+
             mtx.lock();
-            bool isOldUser=NumberofUsers.find(readpacket._payload) != NumberofUsers.end();
+            bool isOldUser = UserLoginCounter.find(readpacket.getPayload()) != UserLoginCounter.end();
             mtx.unlock();
+
             if (isOldUser) {
+
                 mtx.lock();
-                bool isFull = NumberofUsers[readpacket._payload]==2;
+                bool isFull = UserLoginCounter[readpacket.getPayload()]==2;
                 mtx.unlock();
+
                 if(isFull) {
-                    n = write(newsockfd,"Login failed\n", 18);
-                    if (n < 0) {
-                        cout << n << endl;
+                    bytesWritten = write(client_socket,"Login failed\n", 18);
+                    if (bytesWritten < 0) {
+                        //cout << bytesWritten << endl;
                         cout <<"ERROR writing to socket\n"<< std::flush;
                     }
                 } else {
+
                     mtx.lock();
-                    NumberofUsers[readpacket._payload]++;
+                    UserLoginCounter[readpacket.getPayload()]++;
                     mtx.unlock();
-                    n = write(newsockfd,"Login successful\n", 18);
-                    if (n < 0) 
+
+                    bytesWritten = write(client_socket,"Login successful\n", 18);
+                    if (bytesWritten < 0) 
                         cout <<"Login successful\n"<< std::flush;
                 }
             } else {
-                mtx.lock();
-                map<string,int>::iterator it = NumberofUsers.begin();
-                database.AddProfile(readpacket._payload);
-                NumberofUsers.insert(it, pair<string,int>(readpacket._payload,1));
+
+                mtx.lock();                
+                map<string,int>::iterator it = UserLoginCounter.begin();
+                database.AddProfile(readpacket.getPayload());
+                UserLoginCounter.insert(it, pair<string,int>(readpacket.getPayload(),1));
                 mtx.unlock();
-                n = write(newsockfd,"Login successful\n", 18);
-                    if (n < 0) 
+
+                bytesWritten = write(client_socket,"Login successful\n", 18);
+                    if (bytesWritten < 0)
                         cout <<"Login successful\n"<< std::flush;
             }
             return true;
@@ -76,7 +83,7 @@ class Server {
 
         void logout(char buffer[]) {
             mtx.lock();
-            NumberofUsers[buffer]--;
+            UserLoginCounter[buffer]--;
             mtx.unlock();
         }
 
@@ -91,33 +98,35 @@ class Server {
             char buffer[256];
             struct sockaddr_in serv_addr, cli_addr;
 
-            if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
+            if ((server_socket
+ = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
                 cout << "ERROR opening socket\n" << std::flush;
             
             serv_addr.sin_family = AF_INET;
             serv_addr.sin_port = htons(PORT);
             serv_addr.sin_addr.s_addr = INADDR_ANY;
             bzero(&(serv_addr.sin_zero), 8);
-            if (::bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+            if (::bind(server_socket, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
                 cout <<"ERROR on binding\n"<<std::flush;
-            listen(sockfd, 5);
+            listen(server_socket, 5);
             cout<<"Server online\n"<<std::flush;
             clilen = sizeof(struct sockaddr_in);
 
             //loop que aceita conexoes novas
             while(true) {
-                if ((newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen)) == -1) 
+                if ((client_socket = accept(server_socket, (struct sockaddr *) &cli_addr, &clilen)) == -1) 
                     cout <<"ERROR on accept\n"<< std::flush;
                 else
                     threadsTCP.insert(threadsTCP.begin(), thread(&Server::TCPloop, this));
             }      
             
-            close(newsockfd);
-            close(sockfd);  
+            close(client_socket);
+            close(server_socket
+);  
         }
 
     private:
-        map<string, int> NumberofUsers;
+        map<string, int> UserLoginCounter;
 
         void TCPloop() {
             string username;
@@ -125,7 +134,7 @@ class Server {
             packet readpacket = packet(buffer);
             
             while(true) {
-                if (recv(newsockfd, &buffer, sizeof(buffer), 0) == -1)
+                if (recv(client_socket, &buffer, sizeof(buffer), 0) == -1)
                     cout <<"Server: ERROR reading from socket\n"<< flush;
 
                 readpacket = packet(buffer);

@@ -7,23 +7,29 @@
 using namespace std;
 
 char* packet::toString() {
-    string myString(this->_payload);
+    int length;
+    string myString(this->getPayload());
     string returnString = "type= " + std::to_string(this->type) + " seqn= " + std::to_string(this->seqn)
                           + " length= " + std::to_string(this->length) + " timestamp= " + std::to_string(this->timestamp)
                           + " string= " + myString;
-    int n = returnString.length();
-    char char_return[n + 1];
+
+    int length = returnString.length();
+    char char_return[length + 1];
     strcpy(char_return, returnString.c_str());
+    
+    //warning: ao retornar dessa maneira, esse endereço de memória é desalocado. 
+    //funciona só porque o conteúdo da memória continua igual
     return char_return;
 }
 
+//Traduz os dados crus do formato type+seqn+length+timestamp+payload para atributos
 packet::packet(char str[2048]) {
-    string strUnmarshal(str);
-    string charArrayMarshal;
+    string untranslatedString(str);
+    string translatedCharArray;
     stringstream ss;
 
-    //cout << strUnmarshal << std::flush;
-    ss << strUnmarshal;
-    ss >> this->type >> this->seqn >> this->length >> this->timestamp >> charArrayMarshal;
-    this->_payload = charArrayMarshal;
+    //cout << untranslatedString << std::flush;
+    ss << untranslatedString;
+    ss >> this->type >> this->seqn >> this->length >> this->timestamp >> translatedCharArray;
+    this->setPayload(translatedCharArray);
 }
