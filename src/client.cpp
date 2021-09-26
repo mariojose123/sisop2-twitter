@@ -5,8 +5,11 @@
 #include <vector>
 #include <iostream>
 #include <boost/algorithm/string.hpp>
+#include <signal.h>
 
 using namespace std;
+
+int sockfd;
 
 struct Login {
     int sockdf;
@@ -14,12 +17,19 @@ struct Login {
 
 vector<string> getInput(){
 	string input;
+    vector<string> arguments;
+    arguments.push_back("error");
+    arguments.push_back("error");
+
 	cout << "> ";
 	getline(cin, input);
 	input.erase(std::remove(input.begin(), input.end(), '\n'), input.end());
-	vector<string> arguments;
-	//boost::split(arguments, input, [](char c){return c == ' ';});
-    boost::split( arguments, input , boost::is_any_of(" "), boost::token_compress_on);
+	
+    if(input.find(" ") != -1)
+    {
+        boost::split(arguments, input, boost::is_any_of(" "), boost::token_compress_on);
+    }
+	
 	return arguments;
 }
 
@@ -92,6 +102,15 @@ bool isLogout(){
     return false;
 }
 
+void signalHandler(int signal){
+    printf("\nCaught signal %d\n",signal);
+    
+    if(signal==2){
+        close(sockfd);
+        cout << "Saiu com sucesso" << endl;
+        exit(EXIT_SUCCESS);
+    }
+}
 
 int main(int argc,char *argv[]) {
     if(argc !=4) {
@@ -99,11 +118,21 @@ int main(int argc,char *argv[]) {
         return 1;
     }
 
+    //inicialização para detectar ctrl+c
+    struct sigaction sigIntHandler;
+    sigIntHandler.sa_handler = signalHandler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+
+    sigaction(SIGINT, &sigIntHandler, NULL);
+    //inicialização para detectar ctrl+c
+
     string profile(argv[1]);
     string port(argv[3]);
     const char* ip(argv[2]);
 
-    int sockfd = get_connection(port, ip);
+    sockfd = get_connection(port, ip);
+
     if (sockfd == -1) {
         cout<<"Server offline" << endl;
         return 2;
@@ -111,12 +140,17 @@ int main(int argc,char *argv[]) {
     
     string initial_message = get_login_message(profile);
     send_message(sockfd, initial_message);
-    
+    vector<string> input;
+    string command;
+    string message;
+
     while (true && !isLogout()) {
         cout << "Enter command: " << std::flush;
-        vector<string> input = getInput();
-        string command = boost::to_upper_copy(input[0]);
-        string message = input[1];
+
+        input = getInput();
+        command = boost::to_upper_copy(input[0]);        
+        message = input[1];
+
         if (command == "FOLLOW") {
             continue;
         } else if (command == "SEND") {
@@ -128,6 +162,5 @@ int main(int argc,char *argv[]) {
         }
     }
 
-    close(sockfd);
     return 0;
 }

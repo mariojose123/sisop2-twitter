@@ -146,10 +146,7 @@ class Server {
 
                 printf("\n\nPacote recebido:\nTipo: %d\nSequência: %d\nTimestamp: %d\n", 
                 readpacket.type, readpacket.seqn, readpacket.timestamp);
-                // cout << "\n\nPacote recebido:\n";
-                // cout << "\nTipo: " + readpacket.type;
-                // cout << "\nSequência: " + readpacket.seqn;
-                // cout << "\nTimestamp: " + readpacket.timestamp;
+
                 cout << "\nPayload: " + readpacket.getPayload() << endl;
 
                 switch(readpacket.type) {
