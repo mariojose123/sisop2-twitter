@@ -6,6 +6,7 @@
 #define NOTIFICATIONPKT 2
 #define FOLLOWPKT 3
 #define MESSAGEPKT 4
+#define LOGOUTPKT 5
 
 class packet {
   public:

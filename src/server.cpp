@@ -81,9 +81,9 @@ class Server {
             return true;
         }
 
-        void logout(char buffer[]) {
+        void logout(string username) {
             mtx.lock();
-            UserLoginCounter[buffer]--;
+            UserLoginCounter[username]--;
             mtx.unlock();
         }
 
@@ -119,7 +119,9 @@ class Server {
 
             //loop que aceita conexoes novas
             while(true) {
+                //cout << "Aguardando conexões" << endl;
                 client_socket = accept(server_socket, (struct sockaddr *) &cli_addr, &clilen);
+                //cout << "Nova conexão" << endl;
                 if (client_socket == -1) 
                     cout <<"ERROR on accept\n"<< std::flush;
                 else
@@ -144,7 +146,7 @@ class Server {
 
                 readpacket = packet(buffer);
 
-                printf("\n\nPacote recebido:\nTipo: %d\nSequência: %d\nTimestamp: %d\n", 
+                printf("Pacote recebido:\nTipo: %d\nSequência: %d\nTimestamp: %d\n", 
                 readpacket.type, readpacket.seqn, readpacket.timestamp);
 
                 cout << "\nPayload: " + readpacket.getPayload() << endl;
@@ -164,6 +166,11 @@ class Server {
                         cout << "Mensagem de " << username << ":\n";
                         cout << readpacket.getPayload() << endl << flush;
                         break;
+                    case LOGOUTPKT:
+                        logout(username);
+                        cout << username << " deslogou." << endl << flush;
+                        close(client_socket);   //não sei o que to fazendo
+                        return;                 //não sei o que to fazendo
                     default:
                         cout << "Tipo de pacote desconhecido!" << endl << flush;
                 }

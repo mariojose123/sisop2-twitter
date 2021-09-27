@@ -74,6 +74,11 @@ string get_tweet_message(string tweet) {
     return message;
 }
 
+string get_logout_message() {
+    string message = "5 0 6 0 LOGOUT ";
+    return message;
+}
+
 void send_message(int sockfd, string message) {
 	/* write in the socket */
     char buffer[2048];
@@ -98,14 +103,23 @@ void send_tweet(int sockfd, string message) {
 	send(sockfd, buffer, strlen(buffer), 0);
 }
 
+void send_logout(int sockfd) {
+	/* write in the socket */
+    string message = get_logout_message();
+    char buffer[2048];
+    strcpy(buffer, message.c_str());
+	send(sockfd, buffer, strlen(buffer), 0);
+}
+
 bool isLogout(){
     return false;
 }
 
 void signalHandler(int signal){
-    printf("\nCaught signal %d\n",signal);
+    printf("\nCtrl+C detectado! (signal %d)\n",signal);
     
     if(signal==2){
+        send_logout(sockfd);
         close(sockfd);
         cout << "Saiu com sucesso" << endl;
         exit(EXIT_SUCCESS);
