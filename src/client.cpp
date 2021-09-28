@@ -15,6 +15,8 @@ struct Login {
     int sockdf;
 };
 
+void logout();
+
 vector<string> getInput(){
 	string input;
     vector<string> arguments;
@@ -23,6 +25,13 @@ vector<string> getInput(){
 
 	cout << "> ";
 	getline(cin, input);
+    
+    if(cin.eof())
+    {
+        cout << endl << "Ctrl+D detectado" << endl;
+        logout();
+    }
+
 	input.erase(std::remove(input.begin(), input.end(), '\n'), input.end());
 	
     if(input.find(" ") != -1)
@@ -111,16 +120,22 @@ void send_logout(int sockfd) {
 	send(sockfd, buffer, strlen(buffer), 0);
 }
 
+void logout()
+{
+    send_logout(sockfd);
+    close(sockfd);
+    cout << "Saiu com sucesso" << endl;
+    exit(EXIT_SUCCESS);
+}
+
 void signalHandler(int signal){
     printf("\nCtrl+C detectado! (signal %d)\n",signal);
     
     if(signal==2){
-        send_logout(sockfd);
-        close(sockfd);
-        cout << "Saiu com sucesso" << endl;
-        exit(EXIT_SUCCESS);
+        logout();
     }
 }
+
 
 int main(int argc,char *argv[]) {
     if(argc !=4) {
