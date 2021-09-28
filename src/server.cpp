@@ -24,8 +24,10 @@ class Server {
         
         int server_socket, client_socket;
 
-        void follow() {
-
+        //follower seguiu followed
+        void follow(string follower, string followed) {
+            cout << follower << " seguiu " << followed << endl << flush;
+            return;
         }
 
         //não funciona:
@@ -158,6 +160,7 @@ class Server {
                         login(readpacket);
                         break;
                     case FOLLOWPKT:
+                        follow(username,readpacket.getPayload());                        
                         break;
                     case NOTIFICATIONPKT:
                         break;

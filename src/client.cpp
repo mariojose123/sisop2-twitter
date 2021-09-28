@@ -64,8 +64,8 @@ string get_login_message(string profile) {
     return message;
 }
 
-string get_follow_message(string profile, string followed) {
-    string message = "3 0 " + to_string(profile.size()) + " 0 " + followed + " ";
+string get_follow_message(string followed) {
+    string message = "3 0 " + to_string(followed.size()) + " 0 " + followed + " ";
     return message;
 }
 
@@ -79,7 +79,7 @@ string get_logout_message() {
     return message;
 }
 
-void send_message(int sockfd, string message) {
+void send_login(int sockfd, string message) {
 	/* write in the socket */
     char buffer[2048];
     strcpy(buffer, message.c_str());
@@ -96,7 +96,7 @@ void send_message(int sockfd, string message) {
 	//close(sockfd); // NO FINAL DA MENSAGEM ELA FECHA A CONEXAO
 }
 
-void send_tweet(int sockfd, string message) {
+void send_message(int sockfd, string message) {
 	/* write in the socket */
     char buffer[2048];
     strcpy(buffer, message.c_str());
@@ -109,10 +109,6 @@ void send_logout(int sockfd) {
     char buffer[2048];
     strcpy(buffer, message.c_str());
 	send(sockfd, buffer, strlen(buffer), 0);
-}
-
-bool isLogout(){
-    return false;
 }
 
 void signalHandler(int signal){
@@ -153,12 +149,12 @@ int main(int argc,char *argv[]) {
     }
     
     string initial_message = get_login_message(profile);
-    send_message(sockfd, initial_message);
+    send_login(sockfd, initial_message);
     vector<string> input;
     string command;
     string message;
 
-    while (true && !isLogout()) {
+    while (true) {
         cout << "Enter command: " << std::flush;
 
         input = getInput();
@@ -166,11 +162,12 @@ int main(int argc,char *argv[]) {
         message = input[1];
 
         if (command == "FOLLOW") {
+            message=get_follow_message(message);
+            send_message(sockfd, message);
             continue;
-        } else if (command == "SEND") {
-            string tweet;
-            tweet=get_tweet_message(message);
-            send_tweet(sockfd, tweet);
+        } else if (command == "SEND") {            
+            message=get_tweet_message(message);
+            send_message(sockfd, message);
         } else {
             cout << "Usage: SEND <message> / FOLLOW <user>" << endl << flush;
         }
