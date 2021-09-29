@@ -156,7 +156,7 @@ class Server {
                 switch(readpacket.type) {
                     case LOGINPKT:
                         username = readpacket.getPayload();
-                        cout << "Username: " << username << endl;
+                        cout << "Login username: " << username << endl;
                         login(readpacket);
                         break;
                     case FOLLOWPKT:
