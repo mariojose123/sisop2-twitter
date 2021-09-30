@@ -10,13 +10,7 @@
 
 using namespace std;
 
-int sockfd;
-
-struct Login {
-    int sockdf;
-};
-
-void logout();
+bool isLogout = false;
 
 vector<string> getInput(){
 	string input;
@@ -30,7 +24,7 @@ vector<string> getInput(){
     if(cin.eof())
     {
         cout << endl << "Ctrl+D detectado" << endl;
-        logout();
+        isLogout=true;
     }
 
 	input.erase(std::remove(input.begin(), input.end(), '\n'), input.end());
@@ -63,22 +57,14 @@ string get_logout_message() {
     return message;
 }
 
-void logout()
-{
-    send_logout(sockfd);
-    close(sockfd);
-    cout << "Saiu com sucesso" << endl;
-    exit(EXIT_SUCCESS);
-}
 
 void signalHandler(int signal){
     printf("\nCtrl+C detectado! (signal %d)\n",signal);
-    
     if(signal==2){
-        logout();
+        //logout();
+        isLogout = true;
     }
 }
-
 
 int main(int argc,char *argv[]) {
     if(argc !=4) {
@@ -106,24 +92,29 @@ int main(int argc,char *argv[]) {
     comunication_manager.sendMessage(login_message);
     //cout << login_message;
     
-    while (true && !isLogout()) {
+    while (true) {
         cout << "Enter command: " << std::flush;
         vector<string> input = getInput();
         string message = input[1];
         string command = boost::to_upper_copy(input[0]);
         string formated_message;
-            formated_message = get_follow_message(message);; // #TODO
+
         if(command == "FOLLOW") {
+            formated_message = get_follow_message(message);; // #TODO
+            comunication_manager.sendMessage(formated_message);
         }
         else if(command == "SEND") {
             formated_message = get_tweet_message(message);
+            comunication_manager.sendMessage(formated_message);
         }
 
-        else if(command == "LOGOUT") {
-            formated_message = ""; // #TODO
+        else if(command == "LOGOUT" || isLogout) {
+            formated_message = get_logout_message();
+            comunication_manager.sendMessage(formated_message);
+            comunication_manager.closeConnection();
+            cout << "Saiu com sucesso" << endl;
+            break;
         }
-        comunication_manager.sendMessage(formated_message);
     }
-    
     return 0;
 }
