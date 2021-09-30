@@ -2,15 +2,15 @@
 // Created by rafa on 22/09/2021.
 //
 
-#include "include/ComunicationManager.hpp"
+#include "include/ClientCommunicationManager.hpp"
 using namespace std;
 
-ComunicationManager::ComunicationManager(const char* ip, string port) {
+ClientCommunicationManager::ClientCommunicationManager(const char* ip, string port) {
     this->ip = ip;
     this->port = port;
 }
 
-void ComunicationManager::openConnection() {
+void ClientCommunicationManager::openConnection() {
     unsigned int port = stoi(this->port);
     struct sockaddr_in serv_addr;
 
@@ -37,11 +37,11 @@ void ComunicationManager::openConnection() {
     return;
 }
 
-void ComunicationManager::closeConnection() {
+void ClientCommunicationManager::closeConnection() {
     close(this->socket_number);
 }
 
-void ComunicationManager::sendMessage(string message) {
+void ClientCommunicationManager::sendMessage(string message) {
     char buffer[2048];
     strcpy(buffer, message.c_str());
     send(this->socket_number, buffer, strlen(buffer), 0);

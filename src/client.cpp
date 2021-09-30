@@ -1,11 +1,8 @@
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <vector>
 #include <iostream>
 #include <boost/algorithm/string.hpp>
-#include "include/ComunicationManager.hpp"
+#include "include/ClientCommunicationManager.hpp"
 #include <signal.h>
 
 using namespace std;
@@ -85,11 +82,11 @@ int main(int argc,char *argv[]) {
     string port(argv[3]);
     const char* ip(argv[2]);
     
-    ComunicationManager comunication_manager = ComunicationManager(ip, port); // #TODO tratamento servidor offline
+    ClientCommunicationManager communication_manager = ClientCommunicationManager(ip, port); // #TODO tratamento servidor offline
 
-    comunication_manager.openConnection();
+    communication_manager.openConnection();
     string login_message = get_login_message(profile);
-    comunication_manager.sendMessage(login_message);
+    communication_manager.sendMessage(login_message);
     //cout << login_message;
     
     while (true) {
@@ -101,17 +98,17 @@ int main(int argc,char *argv[]) {
 
         if(command == "FOLLOW") {
             formated_message = get_follow_message(message);; // #TODO
-            comunication_manager.sendMessage(formated_message);
+            communication_manager.sendMessage(formated_message);
         }
         else if(command == "SEND") {
             formated_message = get_tweet_message(message);
-            comunication_manager.sendMessage(formated_message);
+            communication_manager.sendMessage(formated_message);
         }
 
         else if(command == "LOGOUT" || isLogout) {
             formated_message = get_logout_message();
-            comunication_manager.sendMessage(formated_message);
-            comunication_manager.closeConnection();
+            communication_manager.sendMessage(formated_message);
+            communication_manager.closeConnection();
             cout << "Saiu com sucesso" << endl;
             break;
         }

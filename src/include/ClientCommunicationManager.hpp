@@ -7,13 +7,13 @@
 #include <boost/algorithm/string.hpp>
 using namespace std;
 
-class ComunicationManager {
+class ClientCommunicationManager {
 private:
     int socket_number;
     const char* ip;
     string port;
 public:
-    ComunicationManager(const char* ip, string port);
+    ClientCommunicationManager(const char* ip, string port);
     void openConnection();
     void closeConnection();
     void sendMessage(string message);
