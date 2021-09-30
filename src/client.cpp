@@ -19,8 +19,7 @@ vector<string> getInput(){
 	getline(cin, input);
     
     if(cin.eof())
-    {
-        cout << endl << "Ctrl+D detectado" << endl;
+    {        
         isLogout=true;
     }
 
@@ -56,7 +55,6 @@ string get_logout_message() {
 
 
 void signalHandler(int signal){
-    printf("\nCtrl+C detectado! (signal %d)\n",signal);
     if(signal==2){
         //logout();
         isLogout = true;
