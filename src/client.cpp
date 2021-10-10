@@ -39,28 +39,6 @@ string get_message(int type, string input){
     return message;
 }
 
-
-string get_login_message(string profile) {
-    string message = "1 0 " + to_string(profile.size()) + " 0 " + profile +" ";
-    return message;
-}
-
-string get_follow_message(string followed) {
-    string message = "3 0 " + to_string(followed.size()) + " 0 " + followed + " ";
-    return message;
-}
-
-string get_tweet_message(string tweet) {
-    string message = "4 0 " + to_string(tweet.size()) + " 0 " + tweet + " ";
-    return message;
-}
-
-string get_logout_message() {
-    string message = "5 0 6 0 LOGOUT ";
-    return message;
-}
-
-
 void signalHandler(int signal){
     if(signal==2){
         //logout();
@@ -90,7 +68,7 @@ int main(int argc,char *argv[]) {
     ClientCommunicationManager communication_manager = ClientCommunicationManager(ip, port); // #TODO tratamento servidor offline
 
     communication_manager.openConnection();
-    string login_message = get_login_message(profile);
+    string login_message = get_message(1, profile); //tipo 1 = login
     communication_manager.sendMessage(login_message);
     //cout << login_message;
     
@@ -102,19 +80,19 @@ int main(int argc,char *argv[]) {
         string formated_message;
 
         if(command == "FOLLOW") {
-            formated_message = get_follow_message(message);; // #TODO
+            formated_message = get_message(3,message);
             communication_manager.sendMessage(formated_message);
         }
         else if(command == "SEND") {
-            formated_message = get_tweet_message(message);
+            formated_message = get_message(4,message);
             communication_manager.sendMessage(formated_message);
         }
-
         else if(command == "LOGOUT" || isLogout) {
-            formated_message = get_logout_message();
+            formated_message = get_message(5,"LOGOUT");
             communication_manager.sendMessage(formated_message);
             communication_manager.closeConnection();
-            cout << "Saiu com sucesso" << endl;
+            cout << "\nSaiu com sucesso" << endl;
+            exit(EXIT_SUCCESS);
             break;
         }
     }
