@@ -40,8 +40,8 @@ string get_message(int type, string input){
 }
 
 void signalHandler(int signal){
+    
     if(signal==2){
-        //logout();
         isLogout = true;
     }
 }
