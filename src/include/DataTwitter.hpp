@@ -20,7 +20,8 @@ class DataTwitter {
     map<string,Profile> Database;
     map<string,int> IDmap;
     DataTwitter();
-    Profile FindProfile(string name);
+    bool isProfileInDatabase(string name);
+    bool    addFollower(string followed, string follower);
     int     FindProfileNumber(string name);
     void    SaveDataBase();
     void    AddProfile(string name);

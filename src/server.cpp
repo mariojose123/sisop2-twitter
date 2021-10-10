@@ -11,7 +11,7 @@
 #include <cstring>
 #include "include/DataTwitter.hpp"
 #include <cstdio>
-#include "utils.cpp"
+#include <stdexcept>
 
 #define PORT 4924
 
@@ -28,14 +28,14 @@ public:
     //follower seguiu followed
     void follow(string follower, string followed) {
         mtx.lock();
-        Profile followed_profile = this->database.FindProfile(followed);
-        cout << follower << " seguiu " << followed << endl << flush;
-        followed_profile.add_follower(follower);
-        cout << "Seguidores de " << followed << ": ";
-        vector<string> followers = followed_profile.get_followers();
-        print_vector(followers);
+        //if this->database.is
+        if (this->database.isProfileInDatabase(followed)) {
+            this->database.addFollower(followed, follower);
+        }
+        else {
+            cerr << "User: " << follower << ": " "Profile "<< followed << " dont exist!" << endl << flush;
+        }
         mtx.unlock();
-        return;
     }
 
     //não funciona:
@@ -79,6 +79,7 @@ public:
         } else {
 
             mtx.lock();
+            //cout << "login" << readpacket.getPayload() << endl << flush;
             map<string, int>::iterator it = UserLoginCounter.begin();
             database.AddProfile(readpacket.getPayload());
             UserLoginCounter.insert(it, pair<string, int>(readpacket.getPayload(), 1));

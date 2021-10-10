@@ -1,9 +1,13 @@
 #include <iostream>
 #include <vector>
+#include <set>
 
-void print_vector(std::vector<string> const &vector){
-    for (int i = 0; i < vector.size(); i++) {
-    std::cout << vector.at(i) << " | ";
+using namespace std;
+
+void print_followers(set<string> const &followers){
+    for (string follower : followers)
+    {
+        cout << follower << ' ' << flush;
     }
-    printf("\n");
+    cout << endl << flush;
 }

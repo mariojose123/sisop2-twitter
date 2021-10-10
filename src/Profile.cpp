@@ -1,10 +1,10 @@
 #include "include/Profile.hpp"
-#include <string>
-#include <vector>
-#include <iostream>
+#include "iostream"
+
+using namespace std;
 
 void Profile::setup_profile(string name) {
-    vector<string> followers;
+    set<string> followers;
     vector<string> messages;
     vector<packet> packets;
     this->name = name;
@@ -14,10 +14,10 @@ void Profile::setup_profile(string name) {
 }
 
 void Profile::add_follower(string name) {
-    this->followers.push_back(name);
+    this->followers.insert(name);
 }
 
-vector<string> Profile::get_followers() {
+set<string> Profile::get_followers() {
     return this->followers;
 }
 
@@ -31,6 +31,4 @@ vector<string> Profile::get_messages() {
 }
 
 void save_profile() {
-
 }
-
