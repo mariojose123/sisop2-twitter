@@ -33,6 +33,13 @@ vector<string> getInput(){
 	return arguments;
 }
 
+string get_message(int type, string input){
+    string message;
+    message=to_string(type) + " 0 " + to_string(input.size()) + " 0 " + input + " ";
+    return message;
+}
+
+
 string get_login_message(string profile) {
     string message = "1 0 " + to_string(profile.size()) + " 0 " + profile +" ";
     return message;

@@ -7,7 +7,7 @@
 
 #include <string>
 #include <iostream>
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 
 
 using namespace std;
@@ -27,7 +27,6 @@ public:
         this->timestamp = 1;//chrono::seconds(std::time(NULL));
         this->length = message.length();
         this->message = message;
-
     }
 
     string getMessage() {
