@@ -90,8 +90,8 @@ int main(int argc,char *argv[]) {
     while (true) {
         cout << "Enter command: " << std::flush;
         vector<string> input = getInput();
-        string message = input[1];
         string command = boost::to_upper_copy(input[0]);
+        string message = input[1];
         string formated_message;
 
         if(command == "FOLLOW") {
