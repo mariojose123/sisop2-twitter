@@ -1,16 +1,18 @@
-#pragma once
 #include <vector>
 #include <string.h>
 #include <set>
 #include "packet.hpp"
+#include <iostream>
+#include <iostream>
+#include <fstream>
 using namespace std;
 class Profile{
-  private:
-    string name;
+  public:
     set<string> followers;
     vector<string> messages;
     vector<packet> pendingNotification;
-  public:
+    string name;
+    string toString();
     void setup_profile(string name);
     void add_follower(string follower);
     set<string> get_followers();

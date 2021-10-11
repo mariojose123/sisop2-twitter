@@ -1,5 +1,12 @@
 #include "include/Profile.hpp"
 #include "iostream"
+#include <iostream>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <sstream>
+#include <iterator>
+#include <numeric>
 
 using namespace std;
 
@@ -35,3 +42,22 @@ void Profile::add_pendingNotification(packet notification){
 
 void save_profile() {
 }
+
+string Profile::toString(){
+    string s;
+    s= s+ this->name;
+    set<string> followers = this->followers;
+    cout<< followers.size();
+    s = s +" "+ to_string(followers.size())+ " ";
+    std::ostringstream stream;
+    std::copy(followers.begin(), followers.end(), std::ostream_iterator<std::string>(stream, " "));
+    s = s +  stream.str();
+    vector<string> messages = this->messages;
+    s = s +" "+ to_string(messages.size())+" ";
+    for(string i : messages){
+        s = s + " " + i;
+    }
+    return s;
+}
+
+

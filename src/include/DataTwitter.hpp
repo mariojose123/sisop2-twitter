@@ -23,7 +23,9 @@ class DataTwitter {
     bool    isProfileInDatabase(string name);
     bool    addFollower(string followed, string follower);
     int     FindProfileNumber(string name);
-    void    SaveDataBase();
+    string    SaveDataBase();
+    Profile StreamtoProfile(ifstream &ss);
+    void     LoadDataBase(ifstream &ss);
     void    AddProfile(string name);
     void    Message(string message,notification Notification);
     void    Follow(string name,string followName);

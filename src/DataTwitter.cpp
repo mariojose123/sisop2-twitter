@@ -1,9 +1,9 @@
 #include "include/DataTwitter.hpp"
-#include "include/Profile.hpp"
 #include "iostream"
 #include <string>
 #include <stdexcept>
 #include "utils.cpp"
+#include <vector>
 
 using namespace std;
 
@@ -13,6 +13,7 @@ DataTwitter::DataTwitter(){
     this->IDmap = nameID;
     this->Database = profileMap;
 }
+
 
 bool DataTwitter::isProfileInDatabase(string profile_name) {
     return this->Database.count(profile_name) > 0;
@@ -58,7 +59,53 @@ void DataTwitter::Follow(string name,string followName)
     
 }
 
-void DataTwitter::SaveDataBase(){
-
+string DataTwitter::SaveDataBase(){
+     map<string, Profile>::iterator it;
+    map<string,Profile> Database =  this->Database;
+    string s;
+    s = s +" "+ to_string(Database.size())+ " ";
+    string v;
+    cout<<s;
+    for (it =Database.begin(); it !=Database.end(); it++)
+    {
+         v = v+ " "+ it->first+" "+it->second.toString();  
+    }
+    s = s+v;
+    return s;
 }
 
+void DataTwitter::LoadDataBase(ifstream &ss){
+    map<string, Profile> profileMap;
+    int lengthprofiles;
+    ss>>lengthprofiles;
+    string name;
+    for( int i =0;i<lengthprofiles;i++){
+        ss>>name;
+        this->Database[name]=StreamtoProfile(ss);
+        this->IDmap[name]= i;
+    }
+}
+
+Profile  DataTwitter::StreamtoProfile(ifstream &ss){
+  Profile p;
+  ss>>p.name;
+  int lengthfollowers;
+  ss>>lengthfollowers;
+  set<string> followers;
+  for(int i=0;i<lengthfollowers;i++){
+    string s;
+    ss>>s;
+    followers.insert(s);
+  }
+  p.followers = followers;
+  int lengthReceivedMessages;
+  ss>>lengthReceivedMessages;
+  vector<string> receivedMessages;
+  for(int i=0;i<lengthReceivedMessages;i++){
+    string s;
+    ss>>s;
+    receivedMessages.push_back(s);
+  }
+  p.messages = receivedMessages;
+  return p;
+}

@@ -12,8 +12,12 @@
 #include "include/DataTwitter.hpp"
 #include <cstdio>
 #include <stdexcept>
+#include <csignal>
+#include <iostream>
+#include <iostream>
+#include <fstream>
 
-#define PORT 4924
+#define PORT 4934
 
 using namespace std;
 
@@ -131,7 +135,6 @@ public:
     int updateData() {
 
     }
-
     void runTCP() {
         int bindSuccess = -1;
         socklen_t clilen;
@@ -172,8 +175,24 @@ public:
         close(client_socket);
         close(server_socket);
     }
+    void load(){
+        ifstream myReadFile;
+        myReadFile.open("server.txt");
+
+        this->database.LoadDataBase(myReadFile);
+        SaveDatabase();
+    }
+
 
 private:
+    void SaveDatabase(){
+            mtx.lock();
+            ofstream myfile ("server.txt");
+            DataTwitter data = this->database;
+            myfile << data.SaveDataBase();
+            myfile.close();
+            mtx.unlock();
+    }
     map<string, int> UserLoginCounter;
 
     void TCPloop() {
@@ -199,9 +218,11 @@ private:
                     username = readpacket.getPayload();
                     cout << "Login username: " << username << endl;
                     login(readpacket);
+                    SaveDatabase();
                     break;
                 case FOLLOWPKT:
                     follow(username, readpacket.getPayload());
+                    SaveDatabase();
                     break;
                 case NOTIFICATIONPKT:
                     break;
@@ -224,6 +245,7 @@ private:
                         }
                     }
                     cout<<endl;
+                    SaveDatabase();
                     break;
                 case LOGOUTPKT:
                     logout(username);
@@ -240,9 +262,9 @@ private:
         // saveServer();
     }
 };
-
+Server server;
 int main() {
-    Server server;
+    server.load();
     server.runTCP();
     return 0;
 }
