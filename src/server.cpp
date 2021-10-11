@@ -38,6 +38,36 @@ public:
         mtx.unlock();
     }
 
+    void storeNotification(packet notification, Profile follower){
+        follower.add_message(notification.getPayload());
+        follower.add_pendingNotification(notification);
+    }
+
+    set<string> checkFollowers(string username){
+        Profile profile;
+        set<string> followers;
+        set<string>::iterator itrFollowers;
+        
+        //se o perfil estiver presente no database, retorna sua lista(set) de followers
+        mtx.lock();
+        if(this->database.isProfileInDatabase(username))
+        {            
+            cout<<"Perfil encontrado"<<endl;
+            profile=this->database.Database.at(username);
+            followers=profile.get_followers();
+            cout<<"Seguidores do perfil:"<<endl;
+            for (itrFollowers = followers.begin(); itrFollowers != followers.end(); itrFollowers++)
+            {                         
+                cout << *itrFollowers<<" ";
+            }
+            cout<<endl;
+        }else{
+            cout<<"Perfil nao encontrado"<<endl;
+        }
+        mtx.unlock();
+        return followers;
+    }
+
     //não funciona:
     void message(std::string message) {
         cout << "Chegou no message: " + message;
@@ -148,6 +178,8 @@ private:
 
     void TCPloop() {
         string username;
+        set<string> followers;
+        set<string>::iterator itrFollowers;
         char buffer[2048];
         packet readpacket = packet(buffer);
 
@@ -177,11 +209,28 @@ private:
                     //message(packet.getPayload())
                     cout << "Mensagem de " << username << ":\n";
                     cout << readpacket.getPayload() << endl << flush;
+                    followers=checkFollowers(username);
+                    for (itrFollowers = followers.begin(); itrFollowers != followers.end(); itrFollowers++)
+                    {
+                        if(this->database.isProfileInDatabase(*itrFollowers))
+                        {                            
+                            storeNotification(readpacket,database.Database[*itrFollowers]);
+                            cout<<"Mensagens recebidas pelo seguidor: "<<endl;
+                            vector<string> messages = database.Database[*itrFollowers].get_messages();
+                            for(auto & elem : messages)
+                            {
+                                cout<<elem<<", ";
+                            }
+                        }
+                    }
+                    cout<<endl;
                     break;
                 case LOGOUTPKT:
                     logout(username);
                     cout << username << " deslogou." << endl << flush;
+                    mtx.lock();
                     close(client_socket);   //não sei o que to fazendo
+                    mtx.unlock();
                     return;                 //não sei o que to fazendo
                 default:
                     cout << "Tipo de pacote desconhecido!" << endl << flush;

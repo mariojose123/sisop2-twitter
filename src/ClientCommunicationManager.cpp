@@ -45,8 +45,8 @@ void ClientCommunicationManager::sendMessage(string message) {
     char buffer[2048];
     strcpy(buffer, message.c_str());
     send(this->socket_number, buffer, strlen(buffer), 0);
-    char bufferread[256];
-    bzero(buffer, 256);
+    // char bufferread[256];
+    // bzero(buffer, 256);
 
 //    /* read from the socket */ // #TODO ARRUMAR
 //    int n = read(this->socket_number, buffer, 256);
@@ -55,6 +55,14 @@ void ClientCommunicationManager::sendMessage(string message) {
 //
 //    cout << buffer << std::flush;
 }
+
+// void ClientCommunicationManager::send_logout(int sockfd) {
+// 	/* write in the socket */
+//     string message = get_logout_message();
+//     char buffer[2048];
+//     strcpy(buffer, message.c_str());
+// 	send(sockfd, buffer, strlen(buffer), 0);
+// }
 
 //void ComunicationMannger::setIp(const char* ip) {
 //    this->ip=ip;

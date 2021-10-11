@@ -16,5 +16,6 @@ class Profile{
     set<string> get_followers();
     void add_message(string message);
     vector<string> get_messages();
+    void add_pendingNotification(packet notification);
 };
  

@@ -21,13 +21,16 @@ set<string> Profile::get_followers() {
     return this->followers;
 }
 
-
 void Profile::add_message(string message) {
     this->messages.push_back(message);
 }
 
 vector<string> Profile::get_messages() {
     return this->messages;
+}
+
+void Profile::add_pendingNotification(packet notification){
+    this->pendingNotification.push_back(notification);
 }
 
 void save_profile() {
