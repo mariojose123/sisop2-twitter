@@ -3,6 +3,7 @@
 #include "Profile.hpp"
 #include <map>
 #include <string.h>
+#include "packet.hpp"
 
 using namespace std;
 
@@ -20,6 +21,7 @@ class DataTwitter {
     map<string,Profile> Database;
     map<string,int> IDmap;
     DataTwitter();
+    void    add_Message(string user,string message,long int timestamp);
     bool    isProfileInDatabase(string name);
     bool    addFollower(string followed, string follower);
     int     FindProfileNumber(string name);
@@ -29,4 +31,5 @@ class DataTwitter {
     void    AddProfile(string name);
     void    Message(string message,notification Notification);
     void    Follow(string name,string followName);
+    void    Notification();
 };

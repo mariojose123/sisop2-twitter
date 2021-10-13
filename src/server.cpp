@@ -17,7 +17,7 @@
 #include <iostream>
 #include <fstream>
 
-#define PORT 4934
+#define PORT 4933
 
 using namespace std;
 
@@ -26,8 +26,6 @@ public:
     mutex mtx;
     DataTwitter database;
     vector <thread> threadsTCP;
-
-    int server_socket, client_socket;
 
     //follower seguiu followed
     void follow(string follower, string followed) {
@@ -81,7 +79,7 @@ public:
 
     }
 
-    int login(packet readpacket) {
+    int login(packet readpacket,int client_socket) {
         int bytesWritten; // se bytesWritten<0 -> erro
 
         mtx.lock();
@@ -136,6 +134,7 @@ public:
 
     }
     void runTCP() {
+        int server_socket, client_socket;
         int bindSuccess = -1;
         socklen_t clilen;
         char buffer[256];
@@ -169,7 +168,7 @@ public:
             if (client_socket == -1)
                 cout << "ERROR on accept\n" << std::flush;
             else
-                threadsTCP.insert(threadsTCP.begin(), thread(&Server::TCPloop, this));
+                threadsTCP.insert(threadsTCP.begin(), thread(&Server::TCPloop, this,server_socket,client_socket));
         }
 
         close(client_socket);
@@ -181,6 +180,10 @@ public:
 
         this->database.LoadDataBase(myReadFile);
         SaveDatabase();
+    }
+    void notification(){
+        this->database.notification();
+
     }
 
 
@@ -194,8 +197,14 @@ private:
             mtx.unlock();
     }
     map<string, int> UserLoginCounter;
+    void sendNotification(string username){
+        vector<packet> notifications = this->database.notificationVector(username);
+        sort
+        send
+        delete
+    }
 
-    void TCPloop() {
+    void TCPloop(int server_socket,int client_socket) {
         string username;
         set<string> followers;
         set<string>::iterator itrFollowers;
@@ -203,6 +212,7 @@ private:
         packet readpacket = packet(buffer);
 
         while (true) {
+            notification();
             if (recv(client_socket, &buffer, sizeof(buffer), 0) == -1)
                 cout << "Server: ERROR reading from socket\n" << flush;
 
@@ -212,39 +222,26 @@ private:
 //                   readpacket.type, readpacket.seqn, readpacket.timestamp);
 
             //cout << "\nPayload: " + readpacket.getPayload() << endl;
-
             switch (readpacket.type) {
                 case LOGINPKT:
                     username = readpacket.getPayload();
                     cout << "Login username: " << username << endl;
-                    login(readpacket);
+                    login(readpacket,client_socket);
                     SaveDatabase();
                     break;
                 case FOLLOWPKT:
+                    cout<<username<<flush;
                     follow(username, readpacket.getPayload());
                     SaveDatabase();
-                    break;
-                case NOTIFICATIONPKT:
                     break;
                 case MESSAGEPKT:
                     //message(packet.getPayload())
                     cout << "Mensagem de " << username << ":\n";
                     cout << readpacket.getPayload() << endl << flush;
-                    followers=checkFollowers(username);
-                    for (itrFollowers = followers.begin(); itrFollowers != followers.end(); itrFollowers++)
-                    {
-                        if(this->database.isProfileInDatabase(*itrFollowers))
-                        {                            
-                            storeNotification(readpacket,database.Database[*itrFollowers]);
-                            cout<<"Mensagens recebidas pelo seguidor: "<<endl;
-                            vector<string> messages = database.Database[*itrFollowers].get_messages();
-                            for(auto & elem : messages)
-                            {
-                                cout<<elem<<", ";
-                            }
-                        }
-                    }
-                    cout<<endl;
+                    cout << " "<<to_string(readpacket.timestamp) << endl <<flush;
+                    mtx.lock();
+                    this->database.add_Message(username,readpacket.getPayload(),readpacket.timestamp);
+                    mtx.unlock();
                     SaveDatabase();
                     break;
                 case LOGOUTPKT:

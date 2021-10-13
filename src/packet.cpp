@@ -33,3 +33,8 @@ packet::packet(char str[2048]) {
     ss >> this->type >> this->seqn >> this->length >> this->timestamp >> translatedCharArray;
     this->setPayload(translatedCharArray);
 }
+
+packet::packet(long int timestamp,string message) {
+    this->setPayload(message);
+    this->timestamp = timestamp;
+}

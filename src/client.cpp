@@ -4,6 +4,7 @@
 #include <boost/algorithm/string.hpp>
 #include "include/ClientCommunicationManager.hpp"
 #include <signal.h>
+#include <ctime>
 
 using namespace std;
 
@@ -35,7 +36,7 @@ vector<string> getInput(){
 
 string get_message(int type, string input){
     string message;
-    message=to_string(type) + " 0 " + to_string(input.size()) + " 0 " + input + " ";
+    message=to_string(type) + " 0 " + to_string(input.size()) +" "+ to_string(static_cast<long int> (time(NULL))) +" "+ input + " ";
     return message;
 }
 
@@ -81,6 +82,7 @@ int main(int argc,char *argv[]) {
 
         if(command == "FOLLOW") {
             formated_message = get_message(3,message);
+            cout<<formated_message;
             communication_manager.sendMessage(formated_message);
         }
         else if(command == "SEND") {

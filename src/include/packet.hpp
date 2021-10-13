@@ -15,7 +15,8 @@ class packet {
     int type;           //Tipo do pacote (p.ex. DATA | CMD) 
     int seqn;           //Número de sequência 
     int length;         //Comprimento do payload  
-    int timestamp;      //Timestamp do dado 
+    long int timestamp;      //Timestamp do dado 
+    packet(long int timestamp,string message);
     
     std::string getPayload(){
       return payload;

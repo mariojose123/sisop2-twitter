@@ -1,9 +1,11 @@
+
 #include "include/DataTwitter.hpp"
 #include "iostream"
 #include <string>
 #include <stdexcept>
 #include "utils.cpp"
 #include <vector>
+#include "packet.hpp"
 
 using namespace std;
 
@@ -20,7 +22,6 @@ bool DataTwitter::isProfileInDatabase(string profile_name) {
 }
 
 bool DataTwitter::addFollower(string followed, string follower) {
-    if (this->Database.count(followed)) {
         //Profile profile = this->Database[followed];
         this->Database[followed].add_follower(follower);
         cout << follower << " seguiu " << followed << endl << flush;
@@ -33,16 +34,41 @@ bool DataTwitter::addFollower(string followed, string follower) {
         //Profile profile2 = this->Database.at(name);
         //cout << "Endereco de " << name << ": " << addressof(this->Database[name]) << endl << flush;
         return true;
-    }
-    else
-        return false;
+}
+
+void DataTwitter::add_Message(string user,string message,long int timestamp){
+    this->Database[user].add_message(message);
+    this->Database[user].add_timestamp(timestamp);
+}
+
+void DataTwitter::Notification(){
+    std::map<string, Profile>::iterator it;
+    vector<long int> minProfileTimestamp;
+    vector<string> Profile;
+    vector<int> profilePosition;
+    vector<string>   message;
+    for (it = this->Database.begin(); it != this->Database.end(); it++)
+       {
+          vector<string> messages = this->Database[it->first].get_messages();
+          vector<bool> isSended = this->Database[it->first].get_isSended();
+          vector<long int> timestamp = this->Database[it->first].get_timestamp();
+          set<string> followers = this->Database[it->first].get_followers();
+          for(int i=0;i<messages.size();i++){
+              if(!(this->Database[it->first].IsSended(i))){
+                for(auto follower : followers){
+                  packet= packet(timestamp[i],messages[i]);
+                  this->Database[follower].add_pendingNotification(packet);
+                }
+              }
+          }
+       }
 }
 
 void DataTwitter::AddProfile(string name) {
     //cout << "\n" << "adicionando perfil " << name << endl << flush;
     Profile profile;
     profile.setup_profile(name);
-    this->Database[name] = profile;
+    this->Database.insert ( std::pair<string,Profile>(name,profile) );
     usercount++;
     this->IDmap[name]=usercount;
 }
