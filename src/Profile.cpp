@@ -68,6 +68,9 @@ string Profile::MessageAt(long int timestamp){
 vector<string> Profile::get_messages() {
     return this->messages;
 }
+vector<bool> Profile::get_isSended(){
+    return this->ismessageSended;
+}
 
 vector<long int> Profile::get_timestamp() {
     return this->timestamp;
@@ -88,6 +91,14 @@ void Profile::add_pendingNotification(packet notification){
 void save_profile() {
 }
 
+void Profile::deletePending(string packetmessage){
+    for(int i=0;i<this->pendingNotification.size();i++){
+        if(this->pendingNotification[i].getPayload()==packetmessage){
+            this->pendingNotification.erase(this->pendingNotification.begin() + i);
+        }
+    }
+}
+
 string Profile::toString(){
     string s;
     s= s+ this->name;
@@ -102,6 +113,24 @@ string Profile::toString(){
     for(string i : messages){
         s = s + " " + i;
     }
+    vector<long int> timestamp = this->timestamp;
+    s = s +" "+ to_string(timestamp.size())+" ";
+    for(long int i : timestamp){
+        s = s + " " + to_string(i);
+    }
+    vector<bool> isSended = this->ismessageSended;
+    s = s +" "+ to_string(isSended.size())+" ";
+    for(bool i : isSended){
+        string stringbool;
+        if(i){
+            stringbool="1";
+        }
+        else{
+            stringbool="0";
+        }
+        s = s + " " + stringbool;
+    }
+
     return s;
 }
 

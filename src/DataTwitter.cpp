@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include "utils.cpp"
 #include <vector>
-#include "packet.hpp"
 
 using namespace std;
 
@@ -54,14 +53,16 @@ void DataTwitter::Notification(){
           vector<long int> timestamp = this->Database[it->first].get_timestamp();
           set<string> followers = this->Database[it->first].get_followers();
           for(int i=0;i<messages.size();i++){
-              if(!(this->Database[it->first].IsSended(i))){
+              if(!(isSended[i])){
                 for(auto follower : followers){
-                  packet= packet(timestamp[i],messages[i]);
-                  this->Database[follower].add_pendingNotification(packet);
+                  packet newpacket1;
+                  newpacket1.newpacket(messages[i],timestamp[i],it->first);
+                  this->Database[follower].add_pendingNotification(newpacket1);
                 }
+                this->Database[it->first].setToTrue(i);
               }
           }
-       }
+          }
 }
 
 void DataTwitter::AddProfile(string name) {
@@ -72,6 +73,7 @@ void DataTwitter::AddProfile(string name) {
     usercount++;
     this->IDmap[name]=usercount;
 }
+
 
 int DataTwitter::FindProfileNumber(string name) {
     return this->IDmap[name];
@@ -133,5 +135,40 @@ Profile  DataTwitter::StreamtoProfile(ifstream &ss){
     receivedMessages.push_back(s);
   }
   p.messages = receivedMessages;
+  int lengthtimeStamp;
+  ss>>lengthtimeStamp;
+  vector<long int> receivedTimestamp;
+  for(int i=0;i<lengthtimeStamp;i++){
+    long int s;
+    ss>>s;
+    receivedTimestamp.push_back(s);
+  }
+  p.timestamp = receivedTimestamp;
+
+  int lengthtimeSent;
+  ss>>lengthtimeSent;
+  vector<bool> receivedSent;
+  for(int i=0;i<lengthtimeSent;i++){
+    string s;
+    ss>>s;
+    bool b;
+    if(s=="0"){
+      b=false;
+    }
+    else{
+      b=true;
+    }
+    receivedSent.push_back(b);
+  }
+  p.ismessageSended = receivedSent;
+
   return p;
+}
+
+vector<packet>   DataTwitter::NotificationVector(string username){
+  return this->Database[username].pendingNotification;
+}
+
+void DataTwitter::deleteNotification(string username,string packetmessage){
+    this->Database[username].deletePending(packetmessage);
 }

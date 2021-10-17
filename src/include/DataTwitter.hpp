@@ -28,8 +28,10 @@ class DataTwitter {
     string    SaveDataBase();
     Profile StreamtoProfile(ifstream &ss);
     void     LoadDataBase(ifstream &ss);
+    void     deleteNotification(string username,string packetmessage);
     void    AddProfile(string name);
     void    Message(string message,notification Notification);
     void    Follow(string name,string followName);
     void    Notification();
+    vector<packet>    NotificationVector(string username);
 };

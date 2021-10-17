@@ -1,0 +1,1 @@
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(479,5): error MSB8041: as bibliotecas MFC são necessárias para este projeto. Instale-as usando o instalador do Visual Studio (guia Componentes Individuais) para todas as arquiteturas e os conjuntos de ferramentas que estão sendo usados.

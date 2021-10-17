@@ -16,8 +16,9 @@
 #include <iostream>
 #include <iostream>
 #include <fstream>
+#include <algorithm>    
 
-#define PORT 4933
+#define PORT 5061
 
 using namespace std;
 
@@ -130,9 +131,7 @@ public:
         mtx.unlock();
     }
 
-    int updateData() {
-
-    }
+    
     void runTCP() {
         int server_socket, client_socket;
         int bindSuccess = -1;
@@ -182,12 +181,16 @@ public:
         SaveDatabase();
     }
     void notification(){
-        this->database.notification();
-
+        mtx.lock();
+        this->database.Notification();
+        mtx.unlock();
     }
 
 
 private:
+    struct myclass {
+        bool operator() (packet i,packet j) { return (i.timestamp<j.timestamp);}
+    } myfunction;
     void SaveDatabase(){
             mtx.lock();
             ofstream myfile ("server.txt");
@@ -197,11 +200,33 @@ private:
             mtx.unlock();
     }
     map<string, int> UserLoginCounter;
-    void sendNotification(string username){
-        vector<packet> notifications = this->database.notificationVector(username);
-        sort
-        send
-        delete
+    void sendNotification(string username,int client_socket){
+        while(true){
+        this_thread::sleep_for (std::chrono::seconds(3));
+        char *buffer;
+        mtx.lock();
+        vector<packet> notifications = this->database.NotificationVector(username);    
+        mtx.unlock();
+        if(notifications.size()>0){
+        sort(notifications.begin(), notifications.end(), myfunction);
+        int bytesWritten;
+        char buffer[2048];
+        bzero(buffer,2048);
+        mtx.lock();
+        string message = "@"+notifications[0].user + " " + notifications[0].getPayload();
+        const char* c =message.c_str();
+        bytesWritten = send(client_socket, c, 256,0);
+                if (bytesWritten < 0) {
+                    //cout << bytesWritten << endl;
+                    cout << "ERROR writing to socket\n" << std::flush;
+            }
+        this->database.deleteNotification(username,notifications[0].getPayload());
+        mtx.unlock();
+        }
+    }
+    }
+    void NotificationLoop(string username){
+        
     }
 
     void TCPloop(int server_socket,int client_socket) {
@@ -210,7 +235,6 @@ private:
         set<string>::iterator itrFollowers;
         char buffer[2048];
         packet readpacket = packet(buffer);
-
         while (true) {
             notification();
             if (recv(client_socket, &buffer, sizeof(buffer), 0) == -1)
@@ -251,6 +275,8 @@ private:
                     close(client_socket);   //não sei o que to fazendo
                     mtx.unlock();
                     return;                 //não sei o que to fazendo
+                case 6:  //notification
+                    sendNotification(readpacket.getPayload(),client_socket);
                 default:
                     cout << "Tipo de pacote desconhecido!" << endl << flush;
             }
@@ -262,6 +288,7 @@ private:
 Server server;
 int main() {
     server.load();
+    server.saveDataBase();
     server.runTCP();
     return 0;
 }

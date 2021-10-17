@@ -3,8 +3,9 @@
 //
 
 #include "include/ClientCommunicationManager.hpp"
+#include <thread>
+#include <mutex>
 using namespace std;
-
 ClientCommunicationManager::ClientCommunicationManager(const char* ip, string port) {
     this->ip = ip;
     this->port = port;
@@ -39,6 +40,29 @@ void ClientCommunicationManager::openConnection() {
 
 void ClientCommunicationManager::closeConnection() {
     close(this->socket_number);
+}
+int ClientCommunicationManager::GetSocketNumber(){
+    this->socket_number;
+}
+void ClientCommunicationManager::readMessageNotification(){
+    while(true){
+    char buffer[2048];
+    int socket = this->socket_number;
+    if (recv(this->socket_number, &buffer, sizeof(buffer), 0) == -1){
+                cout << "Server: ERROR reading from socket\n" << flush;
+    }
+    cout<<buffer<<flush;
+    }
+    }
+
+void ClientCommunicationManager::ThreadNotification(){
+    this->t1 = thread(&ClientCommunicationManager::readMessageNotification, this);
+}
+
+
+
+void ClientCommunicationManager::JoinThread(){
+    this->t1.join();
 }
 
 void ClientCommunicationManager::sendMessage(string message) {
@@ -87,3 +111,11 @@ void ClientCommunicationManager::sendMessage(string message) {
 //int ComunicationMannger::getSockerNumber(){
 //    return this->socket_number;
 //}
+void ClientCommunicationManager::receiveMessage() {
+    char buffer[2048];
+    bzero(buffer,256);
+    if (recv(this->socket_number, &buffer, 256, 0) < 0){
+        cout<<"error"<<flush;
+    }
+    cout<<buffer<<flush;
+}

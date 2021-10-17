@@ -10,20 +10,22 @@
 
 class packet {
   public:
+    std::string user;
     char* toString();   //Traduz os dados de string para vetor de caracteres
+    packet(){}
     packet(char* stri); //Organiza os atributos a partir dos dados crus recebidos
     int type;           //Tipo do pacote (p.ex. DATA | CMD) 
     int seqn;           //Número de sequência 
     int length;         //Comprimento do payload  
     long int timestamp;      //Timestamp do dado 
-    packet(long int timestamp,string message);
+    void newpacket(std::string message1,long int timestamp1,std::string user);
     
     std::string getPayload(){
       return payload;
     }
 
     void setPayload(std::string newPayload){
-      payload = newPayload;
+      this->payload = newPayload;
     }
     
   private:

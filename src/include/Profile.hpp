@@ -21,7 +21,9 @@ class Profile{
     void add_timestamp(long int timestamp);
     void setup_profile(string name);
     void add_follower(string follower);
+    void deletePending(string packetmessage);
     set<string> get_followers();
+    vector<bool> get_isSended();
     void add_message(string message);
     vector<string> get_messages();
     void add_pendingNotification(packet notification);

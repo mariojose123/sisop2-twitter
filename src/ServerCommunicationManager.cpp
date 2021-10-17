@@ -6,5 +6,5 @@
 using namespace std;
 
 ServerCommunicationManager::ServerCommunicationManager() {
-    this->server_socket_number
+    this->server_socket_number;
 }

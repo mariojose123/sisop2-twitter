@@ -34,7 +34,8 @@ packet::packet(char str[2048]) {
     this->setPayload(translatedCharArray);
 }
 
-packet::packet(long int timestamp,string message) {
-    this->setPayload(message);
-    this->timestamp = timestamp;
+void packet::newpacket(string message1,long int timestamp1,string user) {
+    this->setPayload(message1);
+    this->user = user;
+    this->timestamp = timestamp1;
 }
